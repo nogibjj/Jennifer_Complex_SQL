@@ -31,3 +31,7 @@ def extract(
         print(f"Failed to retrieve the file. HTTP Status Code: {response.status_code}")
 
     return file_path
+
+
+if __name__ == "__main__":
+    extract()

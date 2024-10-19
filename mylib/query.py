@@ -1,66 +1,56 @@
-"""Query the database"""
+"""Query the database from a db connection to Databricks"""
 
-import sqlite3
-
-
-def DBquery():
-    """Query the database for the top 10 rows of the GooseDB table"""
-    conn = sqlite3.connect("GooseDB.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM GooseDB LIMIT 10")
-    print("Top 10 rows of the GooseDB table:")
-    print(cursor.fetchall())
-    conn.close()
-    return "Query Successfully"
+import os
+from databricks import sql
+from dotenv import load_dotenv
 
 
-def CRUD_Create():
-    conn = sqlite3.connect("GooseDB.db")
-    cursor = conn.cursor()
-    # create execution
-    cursor.execute(
-        "INSERT INTO GooseDB (name,year,team,league,goose_eggs,broken_eggs,mehs,"
-        "league_average_gpct,ppf,replacement_gpct,gwar,key_retro)"
-        "VALUES ('Jennifer Li', 2024, 'DKU', 'AL', 0, 0, 0, 0.0, 0.0, 0.0, 0.0, "
-        "'jennifer101')"
-    )
-    conn.commit()
-    conn.close()
-    return "Create Successfully"
+complex_query = """
+WITH goose_stats AS (
+    SELECT
+        team,
+        league,
+        COUNT(name) AS total_players,
+        ROUND(AVG(goose_eggs), 1) AS avg_goose_eggs,
+        ROUND(AVG(broken_eggs), 1) AS avg_broken_eggs
+    FROM
+        default.goosedb
+    GROUP BY
+        team, league
+)
+
+SELECT * FROM default.goosedb
+JOIN 
+    goose_stats
+ON 
+    default.goosedb.team = goose_stats.team AND default.goosedb.league = goose_stats.league
+ORDER BY 
+    goose_stats.avg_goose_eggs DESC;
+"""
 
 
-def CRUD_Read():
-    conn = sqlite3.connect("GooseDB.db")
-    cursor = conn.cursor()
-    # read execution
-    cursor.execute("SELECT * FROM GooseDB LIMIT 10")
-    conn.close()
-    return "Read Successfully"
+def query():
+    """Query the database"""
+    load_dotenv()
+    with sql.connect(
+        server_hostname=os.getenv("SERVER_HOSTNAME"),
+        http_path=os.getenv("HTTP_PATH"),
+        access_token=os.getenv("DATABRICKS_KEY"),
+    ) as connection:
 
+        with connection.cursor() as cursor:
 
-def CRUD_Update():
-    conn = sqlite3.connect("GooseDB.db")
-    cursor = conn.cursor()
-    # update execution
-    cursor.execute("UPDATE GooseDB SET year = 2024 WHERE key_retro = 'luqud101'")
-    conn.commit()
-    conn.close()
-    return "Update Successfully"
+            cursor.execute(complex_query)
+            result = cursor.fetchall()
 
+            for row in result:
+                print(row)
 
-def CRUD_Delete():
-    conn = sqlite3.connect("GooseDB.db")
-    cursor = conn.cursor()
-    # delete execution
-    cursor.execute("DELETE FROM GooseDB WHERE key_retro = 'kircm101'")
-    conn.commit()
-    conn.close()
-    return "Delete Successfully"
+            cursor.close()
+            connection.close()
+
+    return "Query successful"
 
 
 if __name__ == "__main__":
-    DBquery()
-    CRUD_Create()
-    CRUD_Read()
-    CRUD_Update()
-    CRUD_Delete()
+    query()
