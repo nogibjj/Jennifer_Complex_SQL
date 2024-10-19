@@ -1,6 +1,8 @@
-
+[![CI](https://github.com/nogibjj/Jennifer_Complex_SQL/actions/workflows/cicd.yml/badge.svg)](https://github.com/nogibjj/Jennifer_Complex_SQL/actions/workflows/cicd.yml)
 
 # Mini Project 6: Complex SQL Query Project for MySQL Database - Baseball Player Performance Analysis
+
+![alt text](image-9.png)
 
 ## Project Purpose
 This project involves extracting, transforming, and loading (ETL) baseball statistics data into an external database Databricks, and then performing complex SQL queries on the data.
@@ -32,7 +34,7 @@ The data used in this project comes FiveThirtyEight's public dataset: https://ra
 
 ![alt text](image-2.png)
 
-#### SQL Explanation
+### SQL Explanation
 
 **SELECT Statement**
 
@@ -72,18 +74,15 @@ The main query then joins this aggregated data back to the original player-level
 
 ![alt text](image-3.png)
 
-#### SQL Explanation
+### SQL Explanation
 
-**SELECT Statement**
+- **SELECT Statement**
 The query selects all columns (`*`) from the combined results of the `default.goosedb` table and the `goose_stats` CTE.
-
-**FROM Clause**
+- **FROM Clause**
 The data is sourced from the `default.goosedb` table, which contains player and team information.
-
-**JOIN Operation**
+- **JOIN Operation**
 The query performs an inner join with the `goose_stats` CTE. The join condition specifies that the `team` and `league` columns in both the `default.goosedb` table and the `goose_stats` CTE must match. This effectively combines the records based on their team and league affiliations.
-
-**ORDER BY Clause**
+- **ORDER BY Clause**
 The results are ordered by `avg_goose_eggs` in descending order. This means that teams with higher average goose eggs will appear first in the result set.
 
 #### Expected Results
@@ -100,11 +99,10 @@ The query will return a combined table that includes all columns from both the `
 
 ![alt text](image-6.png)
 
-![alt text](image-7.png)
+## Testing Passed
 
-## Testing
+![alt text](image-10.png)
 
-![alt text](image-8.png)
 
 ## References
 https://github.com/nogibjj/sqlite-lab
