@@ -23,7 +23,8 @@ SELECT * FROM default.goosedb
 JOIN 
     goose_stats
 ON 
-    default.goosedb.team = goose_stats.team AND default.goosedb.league = goose_stats.league
+    default.goosedb.team = (goose_stats.team AND 
+    default.goosedb.league = goose_stats.league)
 ORDER BY 
     goose_stats.avg_goose_eggs DESC;
 """
