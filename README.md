@@ -1,7 +1,7 @@
-[![CI](https://github.com/nogibjj/Jennifer_Python_SQL_mini_5/actions/workflows/cicd.yml/badge.svg)](https://github.com/nogibjj/Jennifer_Python_SQL_mini_5/actions/workflows/cicd.yml)
 
 
-# Mini Project 5: Python Script interacting with SQL Database
+
+# Mini Project 6: Python Script interacting with SQL Database
 
 ## Project Purpose
 This mini 5 project focuses on integrating Python scripting with SQL databases, allowing for efficient data manipulation and retrieval. The main objectives are to establish database connections, perform CRUD (Create, Read, Update, Delete) operations, and execute various SQL queries.
