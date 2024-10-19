@@ -3,7 +3,6 @@
 import os
 from databricks import sql
 from dotenv import load_dotenv
-from databricks.sql import OperationalError, ServerOperationError
 
 complex_query = """
 WITH goose_stats AS (
@@ -66,73 +65,25 @@ ORDER BY
 
 def query():
     """Query the database"""
-    load_dotenv()  # Load environment variables from .env file
+    load_dotenv()
+    with sql.connect(
+        server_hostname=os.getenv("SERVER_HOSTNAME"),
+        http_path=os.getenv("HTTP_PATH"),
+        access_token=os.getenv("DATABRICKS_KEY"),
+    ) as connection:
 
-    try:
-        # Establish connection to Databricks
-        with sql.connect(
-            server_hostname=os.getenv("SERVER_HOSTNAME"),
-            http_path=os.getenv("HTTP_PATH"),
-            access_token=os.getenv("DATABRICKS_KEY"),
-        ) as connection:
+        with connection.cursor() as cursor:
 
-            # Create cursor and execute query
-            with connection.cursor() as cursor:
-                try:
-                    print(f"Executing query: {complex_query}")
-                    cursor.execute(complex_query)
-                    result = cursor.fetchall()
+            cursor.execute(complex_query)
+            result = cursor.fetchall()
 
-                    print(f"Number of rows returned: {len(result)}")
-                    if result:
-                        for row in result:
-                            print(row)
-                    else:
-                        print("No rows returned from the query")
+            for row in result:
+                print(row)
 
-                except ServerOperationError as e:
-                    print(f"Query execution failed: {e}")
-                    return "Query failed"
-
-                except Exception as e:
-                    print(f"Unexpected error during query execution: {e}")
-                    return "Query failed due to an unexpected error"
-
-    except OperationalError as e:
-        print(f"Connection to Databricks failed: {e}")
-        return "Connection failed"
-
-    except Exception as e:
-        print(f"Unexpected error: {e}")
-        return "An unexpected error occurred"
-
-    finally:
-        print("Query process completed")
+            cursor.close()
+            connection.close()
 
     return "Query successful"
-
-
-# def query():
-#     """Query the database"""
-#     load_dotenv()
-#     with sql.connect(
-#         server_hostname=os.getenv("SERVER_HOSTNAME"),
-#         http_path=os.getenv("HTTP_PATH"),
-#         access_token=os.getenv("DATABRICKS_KEY"),
-#     ) as connection:
-
-#         with connection.cursor() as cursor:
-
-#             cursor.execute(complex_query)
-#             result = cursor.fetchall()
-
-#             for row in result:
-#                 print(row)
-
-#             cursor.close()
-#             connection.close()
-
-#     return "Query successful"
 
 
 if __name__ == "__main__":
