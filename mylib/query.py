@@ -28,8 +28,6 @@ ORDER BY
     goose_stats.avg_goose_eggs DESC;
 """
 
-print(complex_query)
-
 
 """Query the database from a db connection to Databricks"""
 

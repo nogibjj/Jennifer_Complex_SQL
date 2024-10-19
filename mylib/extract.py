@@ -1,7 +1,6 @@
 """
-Extract a dataset from a URL to a file path
+Extract the dataset 
 
-food dataset
 """
 
 import os
