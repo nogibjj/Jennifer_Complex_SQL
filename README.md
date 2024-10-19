@@ -18,16 +18,6 @@ The data used in this project comes FiveThirtyEight's public dataset: https://ra
 
 ### Data Extraction & Transformation
 Use function 'extract()' to fetch data from a URL and save it as the CSV data. Then use the function 'load()' to transforms the CSV data and loads it into a SQLite database named GooseDB.db
-![alt text](image-3.png)
-
-### SQL Queries
-![alt text](image-4.png)
-
-### Database Operations
-![alt text](image-2.png)
-
-### Testing
-![alt text](image.png)
 
 
 ## References

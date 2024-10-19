@@ -21,9 +21,18 @@ def test_load():
 
 
 def test_query():
-    """test query function"""
-    test3 = query()
-    assert test3 == "Query successful"
+    """Test query function"""
+    try:
+        test3 = query()
+        assert test3 == "Query successful", f"Expected 'Query successful', got: {test3}"
+    except Exception as e:
+        assert False, f"Query function raised an exception: {e}"
+
+
+# def test_query():
+#     """test query function"""
+#     test3 = query()
+#     assert test3 == "Query successful"
 
 
 if __name__ == "__main__":

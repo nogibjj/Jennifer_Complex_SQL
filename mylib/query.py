@@ -3,7 +3,7 @@
 import os
 from databricks import sql
 from dotenv import load_dotenv
-
+from databricks.sql import OperationalError, ServerOperationError
 
 complex_query = """
 WITH goose_stats AS (
@@ -23,7 +23,41 @@ SELECT * FROM default.goosedb
 JOIN 
     goose_stats
 ON 
-    default.goosedb.team = (goose_stats.team AND 
+    (default.goosedb.team = goose_stats.team AND 
+    default.goosedb.league = goose_stats.league)
+ORDER BY 
+    goose_stats.avg_goose_eggs DESC;
+"""
+
+print(complex_query)
+
+
+"""Query the database from a db connection to Databricks"""
+
+import os
+from databricks import sql
+from dotenv import load_dotenv
+from databricks.sql import OperationalError, ServerOperationError
+
+# Define the complex query
+complex_query = """
+WITH goose_stats AS (
+    SELECT
+        team,
+        league,
+        COUNT(name) AS total_players,
+        ROUND(AVG(goose_eggs), 1) AS avg_goose_eggs,
+        ROUND(AVG(broken_eggs), 1) AS avg_broken_eggs
+    FROM
+        default.goosedb
+    GROUP BY
+        team, league
+)
+SELECT * FROM default.goosedb
+JOIN 
+    goose_stats
+ON 
+    (default.goosedb.team = goose_stats.team AND 
     default.goosedb.league = goose_stats.league)
 ORDER BY 
     goose_stats.avg_goose_eggs DESC;
@@ -32,25 +66,73 @@ ORDER BY
 
 def query():
     """Query the database"""
-    load_dotenv()
-    with sql.connect(
-        server_hostname=os.getenv("SERVER_HOSTNAME"),
-        http_path=os.getenv("HTTP_PATH"),
-        access_token=os.getenv("DATABRICKS_KEY"),
-    ) as connection:
+    load_dotenv()  # Load environment variables from .env file
 
-        with connection.cursor() as cursor:
+    try:
+        # Establish connection to Databricks
+        with sql.connect(
+            server_hostname=os.getenv("SERVER_HOSTNAME"),
+            http_path=os.getenv("HTTP_PATH"),
+            access_token=os.getenv("DATABRICKS_KEY"),
+        ) as connection:
 
-            cursor.execute(complex_query)
-            result = cursor.fetchall()
+            # Create cursor and execute query
+            with connection.cursor() as cursor:
+                try:
+                    print(f"Executing query: {complex_query}")
+                    cursor.execute(complex_query)
+                    result = cursor.fetchall()
 
-            for row in result:
-                print(row)
+                    print(f"Number of rows returned: {len(result)}")
+                    if result:
+                        for row in result:
+                            print(row)
+                    else:
+                        print("No rows returned from the query")
 
-            cursor.close()
-            connection.close()
+                except ServerOperationError as e:
+                    print(f"Query execution failed: {e}")
+                    return "Query failed"
+
+                except Exception as e:
+                    print(f"Unexpected error during query execution: {e}")
+                    return "Query failed due to an unexpected error"
+
+    except OperationalError as e:
+        print(f"Connection to Databricks failed: {e}")
+        return "Connection failed"
+
+    except Exception as e:
+        print(f"Unexpected error: {e}")
+        return "An unexpected error occurred"
+
+    finally:
+        print("Query process completed")
 
     return "Query successful"
+
+
+# def query():
+#     """Query the database"""
+#     load_dotenv()
+#     with sql.connect(
+#         server_hostname=os.getenv("SERVER_HOSTNAME"),
+#         http_path=os.getenv("HTTP_PATH"),
+#         access_token=os.getenv("DATABRICKS_KEY"),
+#     ) as connection:
+
+#         with connection.cursor() as cursor:
+
+#             cursor.execute(complex_query)
+#             result = cursor.fetchall()
+
+#             for row in result:
+#                 print(row)
+
+#             cursor.close()
+#             connection.close()
+
+#     return "Query successful"
 
 
 if __name__ == "__main__":
